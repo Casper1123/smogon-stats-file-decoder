@@ -7,7 +7,7 @@ Here is an example:\
 > | Cloyster 85.624 (95.07±2.36)           |\
 > |	 (39.8% KOed / 55.3% switched out)|
 
-I have no idea what this 85.624 means. If you know please let me know so I can rename it all across the board.\
+I have no idea what this ```85.624``` means. If you know please let me know so I can rename it all across the board.\
 It is included in the dicts.
 # Here is some documentation because you will need it.
 https://github.com/Casper1123/smogon-moveset-file-decoder/wiki
