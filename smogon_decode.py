@@ -41,12 +41,12 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
 def get_mon_data_from_moveset_file(moveset_file: list or str, pokemon_name: str) -> dict:
     dataset = decode_smogon_moveset_data(moveset_file)
     for mon in dataset:
-        if mon["name"] == pokemon_name:
+        if mon["name"].lower() == pokemon_name.lower():
             return mon
     raise UnfoundMon(f"Did not find '{pokemon_name}' in the submitted Smogon Moveset file. Be sure that it is exactly the same as the files say. It is just an a == b check that this runs.")
 
 
-def decode_smogon_moveset_data(moveset_file: list or str) -> list[dict]:
+def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
     def float_int(number: float) -> bool:
         return abs(number - int(number)) < .01
 
@@ -235,47 +235,55 @@ def decode_smogon_moveset_data(moveset_file: list or str) -> list[dict]:
 
 # Example dictionary
 data_template = [
-    {"name": str,
-     "general": {"raw_count": int,
-                 "average_weight": float,
-                 "viability_ceiling": int},
-     "abilities": [
-         {"name": str,
-          "usage": float}],
-     "items": [
-         {"name": str,
-          "usage": float}],
-     "spreads": [
-         {
-             "nature": str,
-             "evs": {
-                 "health": int,
-                 "attack": int,
-                 "defense": int,
-                 "special-attack": int,
-                 "special-defense": int,
-                 "speed": int},
-             "usage": float
-         }],
-     "moves": [
-         {
-             "name": str,
-             "usage": float
-         }],
-     "teammates": [
-         {
-             "name": str,
-             "usage": float
-         }],
-     "checks_and_counters": [
-         {
-             "name": str,
-             "effectiveness": float,
-             "effectiveness_offset": float,
-             "unknown_statistic": float,
-             "ko": float,
-             "switched_out": float
-         }
-     ]
-     }
+    {
+        "name": str,
+        "general":
+            {
+                "raw_count": int,
+                "average_weight": float,
+                "viability_ceiling": int
+            },
+        "abilities": [
+            {
+                "name": str,
+                "usage": float
+            }],
+        "items": [
+            {
+                "name": str,
+                "usage": float
+            }],
+        "spreads": [
+            {
+                "nature": str,
+                "evs": {
+                    "health": int,
+                    "attack": int,
+                    "defense": int,
+                    "special-attack": int,
+                    "special-defense": int,
+                    "speed": int
+                },
+                "usage": float
+            }],
+        "moves": [
+            {
+                "name": str,
+                "usage": float
+            }],
+        "teammates": [
+            {
+                "name": str,
+                "usage": float
+            }],
+        "checks_and_counters": [
+            {
+                "name": str,
+                "effectiveness": float,
+                "effectiveness_offset": float,
+                "unknown_statistic": float,
+                "ko": float,
+                "switched_out": float
+            }]
+    }
 ]
