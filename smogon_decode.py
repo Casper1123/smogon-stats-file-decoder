@@ -29,6 +29,7 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
     :param generation: The generation (I.E. '5')
     :param gamemode: The gamemode (I.E. 'ou')
     :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
+    :param monotype: Redirects to the /monotype/ subfolder.
     :return: a LOOOOOONG string containing all the data from the file. This is raw.
     """
     from datetime import datetime
@@ -36,13 +37,14 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
     monotyping = ""
     if monotype:
         monotyping = "/monotype"
+        gamemode = f"monotype-{gamemode.lower()}"
 
     now = datetime.now()
     if (year == now.year and month >= now.month) or year > now.year:
         raise RegistryError("Smogon only has files on past months and years.")
     if len(str(month)) < 2:
         month = f"0{month}"
-    data = requests.get(f"https://www.smogon.com/stats/{year}-{month}/moveset{monotyping}/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+    data = requests.get(f"https://www.smogon.com/stats/{year}-{month}{monotyping}/moveset/gen{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
         raise Error404("Did not find a file with given arguments.")
     return data
@@ -250,6 +252,7 @@ def get_leads_file(year: int, month: int, generation: int, gamemode: str, mmr: i
     :param generation: The generation (I.E. '5')
     :param gamemode: The gamemode (I.E. 'ou')
     :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
+        :param monotype: Redirects to the /monotype/ subfolder.
     :return: a LOOOOOONG string containing all the data from the file. This is raw.
     """
     from datetime import datetime
@@ -258,6 +261,7 @@ def get_leads_file(year: int, month: int, generation: int, gamemode: str, mmr: i
     monotyping = ""
     if monotype:
         monotyping = "/monotype"
+        gamemode = f"monotype-{gamemode.lower()}"
 
     now = datetime.now()
     if (year == now.year and month >= now.month) or year > now.year:
@@ -265,7 +269,7 @@ def get_leads_file(year: int, month: int, generation: int, gamemode: str, mmr: i
     if len(str(month)) < 2:
         month = f"0{month}"
     data = requests.get(
-        f"https://www.smogon.com/stats/{year}-{month}/leads{monotyping}/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/leads/gen{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
         raise Error404("Did not find a file with given arguments.")
     return data
@@ -311,6 +315,7 @@ def get_metagame_file(year: int, month: int, generation: int, gamemode: str, mmr
     :param generation: The generation (I.E. '5')
     :param gamemode: The gamemode (I.E. 'ou')
     :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
+    :param monotype: Redirects to the /monotype/ subfolder.
     :return: a LOOOOOONG string containing all the data from the file. This is raw.
     """
     from datetime import datetime
@@ -319,6 +324,7 @@ def get_metagame_file(year: int, month: int, generation: int, gamemode: str, mmr
     monotyping = ""
     if monotype:
         monotyping = "/monotype"
+        gamemode = f"monotype-{gamemode.lower()}"
 
     now = datetime.now()
     if (year == now.year and month >= now.month) or year > now.year:
@@ -326,7 +332,7 @@ def get_metagame_file(year: int, month: int, generation: int, gamemode: str, mmr
     if len(str(month)) < 2:
         month = f"0{month}"
     data = requests.get(
-        f"https://www.smogon.com/stats/{year}-{month}/metagame{monotyping}/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/metagame/gen{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
         raise Error404("Did not find a file with given arguments.")
     return data
