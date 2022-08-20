@@ -35,7 +35,7 @@ def convert_to_json(dictionaries: list[dict] or dict) -> str:
 
 
 # /moveset/
-def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr: int, monotype: bool = False) -> str:
+def get_moveset_file(year: int, month: int, generation: int or str, gamemode: str, mmr: int, monotype: bool = False) -> str:
     """
     :param year: The year (I.E. '2021')
     :param month: The month (I.E. '5', '05', '11')
@@ -52,15 +52,19 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
         monotyping = "/monotype"
         gamemode = f"monotype-{gamemode.lower()}"
 
+    gen = "gen"
+    if generation == "nationaldex":
+        gen = ""
+
     now = datetime.now()
     if (year == now.year and month >= now.month) or year > now.year:
         raise RegistryError("Smogon only has files on past months and years.")
     if len(str(month)) < 2:
         month = f"0{month}"
     data = requests.get(
-        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/moveset/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/moveset/{gen}{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
-        raise Error404(f"Did not find a file with given arguments {year}-{month}, {monotyping}, gen{generation} {gamemode.lower()}, mmr: {mmr}.")
+        raise Error404(f"Did not find a file with given arguments {year}-{month}, {monotyping}, {gen}{generation} {gamemode.lower()}, mmr: {mmr}.")
     return data
 
 
@@ -272,7 +276,7 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
 
 
 # /leads/
-def get_leads_file(year: int, month: int, generation: int, gamemode: str, mmr: int, monotype: bool = False) -> str:
+def get_leads_file(year: int, month: int, generation: int or str, gamemode: str, mmr: int, monotype: bool = False) -> str:
     """
     :param year: The year (I.E. '2021')
     :param month: The month (I.E. '5', '05', '11')
@@ -290,15 +294,19 @@ def get_leads_file(year: int, month: int, generation: int, gamemode: str, mmr: i
         monotyping = "/monotype"
         gamemode = f"monotype-{gamemode.lower()}"
 
+    gen = "gen"
+    if generation == "nationaldex":
+        gen = ""
+
     now = datetime.now()
     if (year == now.year and month >= now.month) or year > now.year:
         raise RegistryError("Smogon only has files on past months and years.")
     if len(str(month)) < 2:
         month = f"0{month}"
     data = requests.get(
-        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/leads/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/leads/{gen}{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
-        raise Error404("Did not find a file with given arguments.")
+        raise Error404(f"Did not find a file with given arguments {year}-{month}, {monotyping}, {gen}{generation} {gamemode.lower()}, mmr: {mmr}.")
     return data
 
 
@@ -336,7 +344,7 @@ def decode_smogon_leads_data(leads_file: list[str] or str) -> list[dict]:
 
 
 # /metagame/
-def get_metagame_file(year: int, month: int, generation: int, gamemode: str, mmr: int, monotype: bool = False) -> str:
+def get_metagame_file(year: int, month: int, generation: int or str, gamemode: str, mmr: int, monotype: bool = False) -> str:
     """
     :param year: The year (I.E. '2021')
     :param month: The month (I.E. '5', '05', '11')
@@ -354,15 +362,19 @@ def get_metagame_file(year: int, month: int, generation: int, gamemode: str, mmr
         monotyping = "/monotype"
         gamemode = f"monotype-{gamemode.lower()}"
 
+    gen = "gen"
+    if generation == "nationaldex":
+        gen = ""
+
     now = datetime.now()
     if (year == now.year and month >= now.month) or year > now.year:
         raise RegistryError("Smogon only has files on past months and years.")
     if len(str(month)) < 2:
         month = f"0{month}"
     data = requests.get(
-        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/metagame/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/metagame/{gen}{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
-        raise Error404("Did not find a file with given arguments.")
+        raise Error404(f"Did not find a file with given arguments {year}-{month}, {monotyping}, {gen}{generation} {gamemode.lower()}, mmr: {mmr}.")
     return data
 
 
@@ -437,7 +449,7 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
 
 
 # General (no subdirectory)
-def get_general_file(year: int, month: int, generation: int, gamemode: str, mmr: int) -> str:
+def get_general_file(year: int, month: int, generation: int or str, gamemode: str, mmr: int) -> str:
     """
     :param year: The year (I.E. '2021')
     :param month: The month (I.E. '5', '05', '11')
@@ -449,15 +461,19 @@ def get_general_file(year: int, month: int, generation: int, gamemode: str, mmr:
     from datetime import datetime
     import requests
 
+    gen = "gen"
+    if generation == "nationaldex":
+        gen = ""
+
     now = datetime.now()
     if (year == now.year and month >= now.month) or year > now.year:
         raise RegistryError("Smogon only has files on past months and years.")
     if len(str(month)) < 2:
         month = f"0{month}"
     data = requests.get(
-        f"https://www.smogon.com/stats/{year}-{month}/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+        f"https://www.smogon.com/stats/{year}-{month}/{gen}{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
-        raise Error404("Did not find a file with given arguments.")
+        raise Error404(f"Did not find a file with given arguments {year}-{month}, {gen}{generation} {gamemode.lower()}, mmr: {mmr}.")
     return data
 
 
