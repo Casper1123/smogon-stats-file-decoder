@@ -354,7 +354,7 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
         "playstyles": [],
         "stalliness": {
             "mean": 0.0,
-            "detailed": {}
+            "detailed": []
 
         }
     }
@@ -388,12 +388,33 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
             tagvalue = float(line.replace("%", "").replace("one # =", ""). replace(" ", ""))
             break  # Grabs the value from the bottom of the file, usually 0.43 but this is here just in case that changes.
 
-    for number, line in enumerate(stallchart[:22]):
-        counter = 0
-        for character in line:
-            if character == "#":
-                counter += 1  # For each # in a line, counts them.
-        metagame_data["stalliness"]["detailed"][str(-2.0 + number * 0.25)] = tagvalue * counter  # Adds the value to the dict.
+    # Grab some important numbers for calcs later
+    foundstart = False
+    startvalue = 0.0
+    value2 = 0.0
+    for line in stallchart:
+        processed = line.replace("#", "").replace(" ", "").replace("|", "")
+        if processed != "":
+            if not foundstart:
+                startvalue = float(processed)
+                foundstart = True
+            else:
+                value2 = float(processed)
+                break
+
+    differencevalue = .5 * abs((startvalue - value2))
+
+    for number, line in enumerate(stallchart):
+        if line.__contains__("|"):
+            counter = 0
+            for character in line:
+                if character == "#":
+                    counter += 1  # For each # in a line, counts them.
+            metagame_data["stalliness"]["detailed"].append(
+                {
+                    "weight": str(startvalue + number * differencevalue),
+                    "value": tagvalue * counter
+                })
 
     return metagame_data
 
@@ -522,8 +543,7 @@ data_template_leads = [
     }
 ]
 
-data_template_metagame = \
-    {
+data_template_metagame = {
         "playstyles": [
             {
                 "name": str,
@@ -532,31 +552,12 @@ data_template_metagame = \
         ],
         "stalliness": {
             "mean": float,
-            "detailed": {
-                "-2.0": float,
-                "-1.75": float,
-                "-1.5": float,
-                "-1.25": float,
-                "-1.0": float,
-                "-0.75": float,
-                "-0.5": float,
-                "-0.25": float,
-                "0.0": float,
-                "0.25": float,
-                "0.5": float,
-                "0.75": float,
-                "1.0": float,
-                "1.25": float,
-                "1.5": float,
-                "1.75": float,
-                "2.0": float,
-                "2.25": float,
-                "2.5": float,
-                "2.75": float,
-                "3.0": float,
-                "3.25": float,
-                "3.5": float
-            }
+            "detailed": [
+                {
+                    "name": str,
+                    "value": float
+                }
+            ]
 
         }
     }
