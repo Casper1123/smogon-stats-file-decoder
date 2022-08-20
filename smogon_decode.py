@@ -2,16 +2,28 @@
 class RegistryError(Exception):
     def __init__(self, message):
         super().__init__(message)
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 
 class Error404(Exception):
     def __init__(self, message):
         super().__init__(message)
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 
 class UnfoundMon(Exception):
     def __init__(self, message):
         super().__init__(message)
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 
 # Functions
@@ -48,7 +60,7 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
     data = requests.get(
         f"https://www.smogon.com/stats/{year}-{month}{monotyping}/moveset/gen{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
-        raise Error404("Did not find a file with given arguments.")
+        raise Error404(f"Did not find a file with given arguments {year}-{month}, {monotyping}, gen{generation} {gamemode.lower()}, mmr: {mmr}.")
     return data
 
 
