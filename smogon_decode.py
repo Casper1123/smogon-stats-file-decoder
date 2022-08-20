@@ -17,7 +17,8 @@ class UnfoundMon(Exception):
 # Functions
 def convert_to_json(dictionaries: list[dict] or dict) -> str:
     import json
-    return json.dumps(dictionaries, sort_keys=True, indent=4)  # Just takes the input and converts it into a .json compatible string.
+    return json.dumps(dictionaries, sort_keys=True,
+                      indent=4)  # Just takes the input and converts it into a .json compatible string.
     # Useful for output from websites as it's already json.
 
 
@@ -44,7 +45,8 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
         raise RegistryError("Smogon only has files on past months and years.")
     if len(str(month)) < 2:
         month = f"0{month}"
-    data = requests.get(f"https://www.smogon.com/stats/{year}-{month}{monotyping}/moveset/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+    data = requests.get(
+        f"https://www.smogon.com/stats/{year}-{month}{monotyping}/moveset/gen{generation}{gamemode.lower()}-{mmr}.txt").text
     if f"{data}".__contains__("<html>"):
         raise Error404("Did not find a file with given arguments.")
     return data
@@ -54,7 +56,8 @@ def get_mon_data_from_data(data_list: list[dict], pokemon_name: str) -> dict:
     for mon in data_list:
         if mon["name"].lower() == pokemon_name.lower():
             return mon
-    raise UnfoundMon(f"Did not find '{pokemon_name}' in the submitted data file. Be sure that it is exactly the same as the files say. It is just an a == b check that this runs.")
+    raise UnfoundMon(
+        f"Did not find '{pokemon_name}' in the submitted data file. Be sure that it is exactly the same as the files say. It is just an a == b check that this runs.")
 
 
 def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
@@ -142,18 +145,21 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
 
             # Start taking the lines apart and adding their content to the right (sub)keys
             if chapter == "name":
-                datadict["name"] = line.replace("|", "").replace(" ", "")  # There is only 1 line of name. Just adds it to the dict
+                datadict["name"] = line.replace("|", "").replace(" ",
+                                                                 "")  # There is only 1 line of name. Just adds it to the dict
 
             elif chapter == "general":
                 split_line = line.split("| ")[1].split(": ")
-                value = float(split_line[1].replace(" ", "").replace("|", ""))  # To prevent doing the same modifications repeatedly
+                value = float(split_line[1].replace(" ", "").replace("|",
+                                                                     ""))  # To prevent doing the same modifications repeatedly
                 if float_int(value):
                     datadict["general"][split_line[0].replace(" ", "_").replace(".", "").lower()] = int(value)
                 else:
                     datadict["general"][split_line[0].replace(" ", "_").replace(".", "").lower()] = value
 
             elif chapter == "abilities":
-                if not line.lower().__contains__("| abilities") and not line.lower().__contains__("| items"):  # It needs to skip this line
+                if not line.lower().__contains__("| abilities") and not line.lower().__contains__(
+                        "| items"):  # It needs to skip this line
                     split_line = raw_line_splitter(line)  # This is a repeated prodedure to take the line apart.
                     datadict["abilities"].append(
                         {
@@ -202,7 +208,8 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
                     )
 
             elif chapter == "teammates":
-                if not line.lower().__contains__("| teammates") and not line.lower().__contains__("| checks and counters"):
+                if not line.lower().__contains__("| teammates") and not line.lower().__contains__(
+                        "| checks and counters"):
                     split_line = raw_line_splitter(line)
                     datadict["teammates"].append(
                         {
@@ -234,13 +241,16 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
                             if entry.__contains__("%"):
                                 split_line.append(entry)
 
-                        checkdata["ko"] = float(split_line[0].removeprefix("(").replace("%", ""))  # Add data to the previously started instance.
+                        checkdata["ko"] = float(split_line[0].removeprefix("(").replace("%",
+                                                                                        ""))  # Add data to the previously started instance.
                         checkdata["switched_out"] = float(split_line[1].replace("%", ""))
 
-                        datadict["checks_and_counters"].append(checkdata)  # Add the data, then reset the instance to default.
+                        datadict["checks_and_counters"].append(
+                            checkdata)  # Add the data, then reset the instance to default.
                         checkdata = {}
 
-    output.append(datadict)  # If it's the last mon of the file, dividers == 9 will not be called and thus would never be appended. This does that.
+    output.append(
+        datadict)  # If it's the last mon of the file, dividers == 9 will not be called and thus would never be appended. This does that.
     return output
 
 
@@ -283,23 +293,24 @@ def decode_smogon_leads_data(leads_file: list[str] or str) -> list[dict]:
 
     total_leads = int(leads_file[0].split(": ")[1].removesuffix("\n"))
 
-    for numbr, line in enumerate(leads_file[:-1]):  # The last line is either a separator or an enter. Exclude it just in case it's an enter.
+    for numbr, line in enumerate(
+            leads_file[:-1]):  # The last line is either a separator or an enter. Exclude it just in case it's an enter.
         # needs to skip first 4 lines, 0-3
         if numbr in [0, 1, 2, 3] or line.__contains__("+ -"):
             pass
         else:
             split_line = line.removesuffix("\n").replace("%", "").split("|")
             leadsdata = {
-                    "name": " ".join(split_line[2].split()),
-                    "rank": int(split_line[1].replace(" ", "")),
-                    "usage": float(split_line[3].replace(" ", "")),
-                    "raw": int(split_line[4].replace(" ", "")),
-                    "raw%": float(split_line[5].replace(" ", "")),
-                    "general": {
-                        "total_leads": total_leads
-                    }
-
+                "name": " ".join(split_line[2].split()),
+                "rank": int(split_line[1].replace(" ", "")),
+                "usage": float(split_line[3].replace(" ", "")),
+                "raw": int(split_line[4].replace(" ", "")),
+                "raw%": float(split_line[5].replace(" ", "")),
+                "general": {
+                    "total_leads": total_leads
                 }
+
+            }
             output.append(leadsdata)
 
     """# Appends last entry
@@ -343,17 +354,19 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
         "playstyles": [],
         "stalliness": {
             "mean": 0.0,
-            "note": "This has not been fully implemented yet."
+            "detailed": {}
+
         }
     }
 
     if f"{type(metagame_file)}" == "<class 'str'>":  # Checks if the given type is a string or not
         metagame_file = metagame_file.split("\n")  # Turns it into a compatible string, line by line.
 
-    for line in metagame_file:
+    stallchart = []  # Required for my IDE not to scream
+    for numbr, line in enumerate(metagame_file):
         line = line.removesuffix("\n")
         if line in ["", ' ']:
-            pass
+            pass  # If this line is this, skip it
 
         elif not line.__contains__("Stalliness (mean: "):
             split_line = line.replace(" ", "").replace("%", "").split(".")
@@ -362,11 +375,25 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
                     "name": split_line[0],
                     "usage": float(f"{split_line[-2]}.{split_line[-1]}")
                 }
-            )
+            )  # Appends playstyle data to the dict
         else:
-            #  Stalliness (mean: -0.654)
             metagame_data["stalliness"]["mean"] = float(line.split(": ")[1].split(")")[0])
-            break
+            stallchart = metagame_file[numbr + 1:]
+            break  # Stops with looking through the file after grabbing the 'mean' value.
+            # Prepares stallchart
+
+    tagvalue = 0.0  # Default value
+    for line in reversed(stallchart):
+        if line.__contains__("one # ="):
+            tagvalue = float(line.replace("%", "").replace("one # =", ""). replace(" ", ""))
+            break  # Grabs the value from the bottom of the file, usually 0.43 but this is here just in case that changes.
+
+    for number, line in enumerate(stallchart[:22]):
+        counter = 0
+        for character in line:
+            if character == "#":
+                counter += 1  # For each # in a line, counts them.
+        metagame_data["stalliness"]["detailed"][str(-2.0 + number * 0.25)] = tagvalue * counter  # Adds the value to the dict.
 
     return metagame_data
 
@@ -403,8 +430,8 @@ def decode_smogon_general_data(general_file: list[str] or str) -> list[dict]:
         general_file = general_file.split("\n")  # Turns it into a compatible string, line by line.
 
     dict_general_data = {
-                "total_battles": int(general_file[0].split(": ")[1].removesuffix("\n")),
-                "avg_weight/team": float(general_file[1].split(": ")[1].removesuffix("\n"))}
+        "total_battles": int(general_file[0].split(": ")[1].removesuffix("\n")),
+        "avg_weight/team": float(general_file[1].split(": ")[1].removesuffix("\n"))}
 
     for numr, line in enumerate(general_file[:-1]):
         # needs to skip first 4 lines, 0-3
@@ -421,7 +448,7 @@ def decode_smogon_general_data(general_file: list[str] or str) -> list[dict]:
                 "real": int(split_line[6].replace(" ", "")),
                 "real%": float(split_line[7].replace(" ", "")),
                 "general": dict_general_data
-                }
+            }
             output.append(datadict)
 
     return output
@@ -495,18 +522,44 @@ data_template_leads = [
     }
 ]
 
-data_template_metagame = {
-    "playstyles": [
-        {
-            "name": str,
-            "usage": float
+data_template_metagame = \
+    {
+        "playstyles": [
+            {
+                "name": str,
+                "usage": float
+            }
+        ],
+        "stalliness": {
+            "mean": float,
+            "detailed": {
+                "-2.0": float,
+                "-1.75": float,
+                "-1.5": float,
+                "-1.25": float,
+                "-1.0": float,
+                "-0.75": float,
+                "-0.5": float,
+                "-0.25": float,
+                "0.0": float,
+                "0.25": float,
+                "0.5": float,
+                "0.75": float,
+                "1.0": float,
+                "1.25": float,
+                "1.5": float,
+                "1.75": float,
+                "2.0": float,
+                "2.25": float,
+                "2.5": float,
+                "2.75": float,
+                "3.0": float,
+                "3.25": float,
+                "3.5": float
+            }
+
         }
-    ],
-    "stalliness": {
-        "mean": float,
-        "note": "This has not been fully implemented yet."
     }
-}
 
 data_template_general = [
     {
