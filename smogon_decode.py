@@ -157,8 +157,13 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
 
             # Start taking the lines apart and adding their content to the right (sub)keys
             if chapter == "name":
-                datadict["name"] = line.replace("|", "").replace(" ",
-                                                                 "")  # There is only 1 line of name. Just adds it to the dict
+                split_line = line.replace("|", "").split(" ")
+                wordslist = []  # God damnit why do the tapus keep breaking this.
+                for entry in split_line:
+                    if entry != '':
+                        wordslist.append(entry)
+                datadict["name"] = " ".join(wordslist)
+                # There is only 1 line of name. Just adds it to the dict
 
             elif chapter == "general":
                 split_line = line.split("| ")[1].split(": ")
