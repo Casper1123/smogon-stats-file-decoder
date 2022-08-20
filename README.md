@@ -3,7 +3,7 @@ Oh do I damn hope I named it correctly, as it's not exactly 'encoded' of any kin
 Takes apart files findable in https://www.smogon.com/stats/yyyy-mm/moveset/ into usable dictionaries in your projects.
 # Does still contain one unknown datapiece
 I genuinely could not find what it is used for.\
-Here is an example:\
+Here is an example:
 > | Cloyster 85.624 (95.07±2.36)           |\
 > |	 (39.8% KOed / 55.3% switched out)|
 
