@@ -152,7 +152,7 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
                     split_line = raw_line_splitter(line)  # This is a repeated prodedure to take the line apart.
                     datadict["abilities"].append(
                         {
-                            "name": " ".join(split_line[:-1]).lower(),
+                            "name": " ".join(split_line[:-1]).title(),
                             "usage": float(split_line[-1])
                         }
                     )  # Add the dict to the list.
