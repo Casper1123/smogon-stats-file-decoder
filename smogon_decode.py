@@ -412,7 +412,7 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
                     counter += 1  # For each # in a line, counts them.
             metagame_data["stalliness"]["detailed"].append(
                 {
-                    "weight": str(startvalue + number * differencevalue),
+                    "weight": startvalue + number * differencevalue,
                     "value": tagvalue * counter
                 })
 
@@ -554,7 +554,7 @@ data_template_metagame = {
             "mean": float,
             "detailed": [
                 {
-                    "name": str,
+                    "weight": float,
                     "value": float
                 }
             ]
