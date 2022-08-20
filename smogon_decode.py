@@ -33,7 +33,7 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
     if len(str(month)) < 2:
         month = f"0{month}"
     data = requests.get(f"https://www.smogon.com/stats/{year}-{month}/moveset/gen{generation}{gamemode.lower()}-{mmr}.txt").text
-    if f"{data}" == "<html>":
+    if f"{data}".__contains__("<html>"):
         raise Error404("Did not find a file with given arguments.")
     return data
 
