@@ -5,7 +5,7 @@ See the wiki below for all compatible filestructures.
 
 # Why this over the /chaos/ section on the stats website?
 I think my information sorting is way better. Is that a little cocky? maybe. I did *just* find out it exists, while I'm basically halfway through the project
-but I still think this option is a good alternative, if not better.
+but I still think this option is a good alternative, if not better than all of /chaos/ itself.
 
 # Here is some documentation because you will probably need it.
 https://github.com/Casper1123/smogon-moveset-file-decoder/wiki
