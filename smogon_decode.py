@@ -29,7 +29,7 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
     :param generation: The generation (I.E. '5')
     :param gamemode: The gamemode (I.E. 'ou')
     :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
-    :param monotype: Redirects to the /monotype/ subfolder.
+    :param monotype: Redirects to the /monotype/ subfolder. Does not include natdex.
     :return: a LOOOOOONG string containing all the data from the file. This is raw.
     """
     from datetime import datetime
@@ -252,7 +252,7 @@ def get_leads_file(year: int, month: int, generation: int, gamemode: str, mmr: i
     :param generation: The generation (I.E. '5')
     :param gamemode: The gamemode (I.E. 'ou')
     :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
-        :param monotype: Redirects to the /monotype/ subfolder.
+        :param monotype: Redirects to the /monotype/ subfolder. Does not include natdex.
     :return: a LOOOOOONG string containing all the data from the file. This is raw.
     """
     from datetime import datetime
@@ -315,7 +315,7 @@ def get_metagame_file(year: int, month: int, generation: int, gamemode: str, mmr
     :param generation: The generation (I.E. '5')
     :param gamemode: The gamemode (I.E. 'ou')
     :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
-    :param monotype: Redirects to the /monotype/ subfolder.
+    :param monotype: Redirects to the /monotype/ subfolder. Does not include natdex.
     :return: a LOOOOOONG string containing all the data from the file. This is raw.
     """
     from datetime import datetime
@@ -350,7 +350,7 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
     if f"{type(metagame_file)}" == "<class 'str'>":  # Checks if the given type is a string or not
         metagame_file = metagame_file.split("\n")  # Turns it into a compatible string, line by line.
 
-    for numr, line in enumerate(metagame_file):
+    for line in metagame_file:
         line = line.removesuffix("\n")
         if line in ["", ' ']:
             pass
@@ -369,6 +369,60 @@ def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
             break
 
     return metagame_data
+
+
+# General (no subdirectory)
+def get_general_file(year: int, month: int, generation: int, gamemode: str, mmr: int) -> str:
+    """
+    :param year: The year (I.E. '2021')
+    :param month: The month (I.E. '5', '05', '11')
+    :param generation: The generation (I.E. '5')
+    :param gamemode: The gamemode (I.E. 'ou')
+    :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
+    :return: a LOOOOOONG string containing all the data from the file. This is raw.
+    """
+    from datetime import datetime
+    import requests
+
+    now = datetime.now()
+    if (year == now.year and month >= now.month) or year > now.year:
+        raise RegistryError("Smogon only has files on past months and years.")
+    if len(str(month)) < 2:
+        month = f"0{month}"
+    data = requests.get(
+        f"https://www.smogon.com/stats/{year}-{month}/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+    if f"{data}".__contains__("<html>"):
+        raise Error404("Did not find a file with given arguments.")
+    return data
+
+
+def decode_smogon_general_data(general_file: list[str] or str) -> list[dict]:
+    output = []
+
+    if f"{type(general_file)}" == "<class 'str'>":  # Checks if the given type is a string or not
+        general_file = general_file.split("\n")  # Turns it into a compatible string, line by line.
+
+    dict_general_data = {
+                "total_battles": int(general_file[0].split(": ")[1].removesuffix("\n")),
+                "avg_weight/team": float(general_file[1].split(": ")[1].removesuffix("\n"))}
+
+    for numr, line in enumerate(general_file[:-1]):
+        # needs to skip first 4 lines, 0-3
+        if numr in [0, 1, 2, 3, 4] or line.__contains__("+ -"):
+            pass
+        else:
+            split_line = line.removesuffix("\n").replace("%", "").split("|")
+            datadict = {
+                "name": " ".join(split_line[2].split()),
+                "rank": int(split_line[1].replace(" ", "")),
+                "usage": float(split_line[3].replace(" ", "")),
+                "raw": int(split_line[4].replace(" ", "")),
+                "raw%": float(split_line[5].replace(" ", "")),
+                "general": dict_general_data
+                }
+            output.append(datadict)
+
+    return output
 
 
 # Example dictionaries
@@ -451,3 +505,17 @@ data_template_metagame = {
         "note": "This has not been fully implemented yet."
     }
 }
+
+data_template_general = [
+    {
+        "name": str,
+        "rank": int,
+        "usage": float,
+        "raw": int,
+        "raw%": float,
+        "general": {
+            "total_battles": int,
+            "avg_weight/team": float
+        }
+    }
+]
