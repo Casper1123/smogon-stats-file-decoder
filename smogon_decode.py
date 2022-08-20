@@ -21,6 +21,7 @@ def convert_to_json(dictionaries: list[dict] or dict) -> str:
     # Useful for output from websites as it's already json.
 
 
+# /moveset/
 def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr: int) -> str:
     """
     :param year: The year (I.E. '2021')
@@ -44,12 +45,11 @@ def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr:
     return data
 
 
-def get_mon_data_from_moveset_file(moveset_file: list or str, pokemon_name: str) -> dict:
-    dataset = decode_smogon_moveset_data(moveset_file)
-    for mon in dataset:
+def get_mon_data_from_data(data_list: list[dict], pokemon_name: str) -> dict:
+    for mon in data_list:
         if mon["name"].lower() == pokemon_name.lower():
             return mon
-    raise UnfoundMon(f"Did not find '{pokemon_name}' in the submitted Smogon Moveset file. Be sure that it is exactly the same as the files say. It is just an a == b check that this runs.")
+    raise UnfoundMon(f"Did not find '{pokemon_name}' in the submitted data file. Be sure that it is exactly the same as the files say. It is just an a == b check that this runs.")
 
 
 def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
@@ -239,8 +239,65 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
     return output
 
 
-# Example dictionary
-data_template = [
+# /leads/
+def get_leads_file(year: int, month: int, generation: int, gamemode: str, mmr: int) -> str:
+    """
+    :param year: The year (I.E. '2021')
+    :param month: The month (I.E. '5', '05', '11')
+    :param generation: The generation (I.E. '5')
+    :param gamemode: The gamemode (I.E. 'ou')
+    :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
+    :return: a LOOOOOONG string containing all the data from the file. This is raw.
+    """
+    from datetime import datetime
+    import requests
+
+    now = datetime.now()
+    if (year == now.year and month >= now.month) or year > now.year:
+        raise RegistryError("Smogon only has files on past months and years.")
+    if len(str(month)) < 2:
+        month = f"0{month}"
+    data = requests.get(
+        f"https://www.smogon.com/stats/{year}-{month}/leads/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+    if f"{data}".__contains__("<html>"):
+        raise Error404("Did not find a file with given arguments.")
+    return data
+
+
+def decode_smogon_leads_data(leads_file: list[str] or str) -> list[dict]:
+    output = []
+
+    if f"{type(leads_file)}" == "<class 'str'>":  # Checks if the given type is a string or not
+        leads_file = leads_file.split("\n")  # Turns it into a compatible string, line by line.
+
+    total_leads = int(leads_file[0].split(": ")[1].removesuffix("\n"))
+
+    for numbr, line in enumerate(leads_file[:-1]):  # The last line is either a separator or an enter. Exclude it just in case it's an enter.
+        # needs to skip first 4 lines, 0-3
+        if numbr in [0, 1, 2, 3] or line.__contains__("+ -"):
+            pass
+        else:
+            split_line = line.removesuffix("\n").replace("%", "").split("|")
+            leadsdata = {
+                    "name": " ".join(split_line[2].split()),
+                    "rank": int(split_line[1].replace(" ", "")),
+                    "usage": float(split_line[3].replace(" ", "")),
+                    "raw": int(split_line[4].replace(" ", "")),
+                    "raw%": float(split_line[5].replace(" ", "")),
+                    "general": {
+                        "total_leads": total_leads
+                    }
+
+                }
+            output.append(leadsdata)
+
+    """# Appends last entry
+    output.append(leadsdata)"""
+    return output
+
+
+# Example dictionaries
+data_template_moveset = [
     {
         "name": str,
         "general":
@@ -291,5 +348,18 @@ data_template = [
                 "ko": float,
                 "switched_out": float
             }]
+    }
+]
+
+data_template_leads = [
+    {
+        "name": str,
+        "rank": int,
+        "usage": float,
+        "raw": int,
+        "raw%": float,
+        "general": {
+            "total_leads": int
+        }
     }
 ]
