@@ -210,10 +210,10 @@ def decode_smogon_moveset_data(moveset_file: list[str] or str) -> list[dict]:
                             if entry.__contains__("±"):
                                 container = entry.split("±")  # gets the weird +- container out of there
                         checkdata = {
-                            "name": split_line[0],
+                            "name": split_line[0:-2],
                             "effectiveness": float(container[0].removeprefix("(")),
                             "effectiveness_offset": float(container[1].removesuffix(")")),
-                            "unknown_statistic": float(split_line[1])
+                            "unknown_statistic": float(split_line[-2])
                         }  # This is a temporary instance of this dict.
                     elif checkcounter == 2:  # This is the second half of the check's entry
                         checkcounter = 0
