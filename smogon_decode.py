@@ -418,6 +418,8 @@ def decode_smogon_general_data(general_file: list[str] or str) -> list[dict]:
                 "usage": float(split_line[3].replace(" ", "")),
                 "raw": int(split_line[4].replace(" ", "")),
                 "raw%": float(split_line[5].replace(" ", "")),
+                "real": int(split_line[6].replace(" ", "")),
+                "real%": float(split_line[7].replace(" ", "")),
                 "general": dict_general_data
                 }
             output.append(datadict)
@@ -513,6 +515,8 @@ data_template_general = [
         "usage": float,
         "raw": int,
         "raw%": float,
+        "real": int,
+        "real%": float,
         "general": {
             "total_battles": int,
             "avg_weight/team": float
