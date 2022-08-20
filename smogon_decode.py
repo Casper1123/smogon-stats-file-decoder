@@ -296,6 +296,64 @@ def decode_smogon_leads_data(leads_file: list[str] or str) -> list[dict]:
     return output
 
 
+# /metagame/
+def get_metagame_file(year: int, month: int, generation: int, gamemode: str, mmr: int) -> str:
+    """
+    :param year: The year (I.E. '2021')
+    :param month: The month (I.E. '5', '05', '11')
+    :param generation: The generation (I.E. '5')
+    :param gamemode: The gamemode (I.E. 'ou')
+    :param mmr: The average mmr the data should be from. Usually available at 0, 1500, 1630, 1760 with some exceptions.
+    :return: a LOOOOOONG string containing all the data from the file. This is raw.
+    """
+    from datetime import datetime
+    import requests
+
+    now = datetime.now()
+    if (year == now.year and month >= now.month) or year > now.year:
+        raise RegistryError("Smogon only has files on past months and years.")
+    if len(str(month)) < 2:
+        month = f"0{month}"
+    data = requests.get(
+        f"https://www.smogon.com/stats/{year}-{month}/metagame/gen{generation}{gamemode.lower()}-{mmr}.txt").text
+    if f"{data}".__contains__("<html>"):
+        raise Error404("Did not find a file with given arguments.")
+    return data
+
+
+def decode_smogon_metagame_data(metagame_file: list[str] or str) -> dict:
+    metagame_data = {
+        "playstyles": [],
+        "stalliness": {
+            "mean": 0.0,
+            "note": "This has not been fully implemented yet."
+        }
+    }
+
+    if f"{type(metagame_file)}" == "<class 'str'>":  # Checks if the given type is a string or not
+        metagame_file = metagame_file.split("\n")  # Turns it into a compatible string, line by line.
+
+    for numr, line in enumerate(metagame_file):
+        line = line.removesuffix("\n")
+        if line in ["", ' ']:
+            pass
+
+        elif not line.__contains__("Stalliness (mean: "):
+            split_line = line.replace(" ", "").replace("%", "").split(".")
+            metagame_data["playstyles"].append(
+                {
+                    "name": split_line[0],
+                    "usage": float(f"{split_line[-2]}.{split_line[-1]}")
+                }
+            )
+        else:
+            #  Stalliness (mean: -0.654)
+            metagame_data["stalliness"]["mean"] = float(line.split(": ")[1].split(")")[0])
+            break
+
+    return metagame_data
+
+
 # Example dictionaries
 data_template_moveset = [
     {
@@ -363,3 +421,16 @@ data_template_leads = [
         }
     }
 ]
+
+data_template_metagame = {
+    "playstyles": [
+        {
+            "name": str,
+            "usage": float
+        }
+    ],
+    "stalliness": {
+        "mean": float,
+        "note": "This has not been fully implemented yet."
+    }
+}
