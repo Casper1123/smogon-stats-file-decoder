@@ -15,6 +15,12 @@ class UnfoundMon(Exception):
 
 
 # Functions
+def convert_to_json(dictionaries: list[dict] or dict) -> str:
+    import json
+    return json.dumps(dictionaries, sort_keys=True, indent=4)  # Just takes the input and converts it into a .json compatible string.
+    # Useful for output from websites as it's already json.
+
+
 def get_moveset_file(year: int, month: int, generation: int, gamemode: str, mmr: int) -> str:
     """
     :param year: The year (I.E. '2021')
