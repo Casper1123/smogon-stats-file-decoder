@@ -1,3 +1,7 @@
+### It's been like two years.
+I wanted to very quickly edit this saying that the code written in here isn't.. too great. It worked as of back then, and probably still does but it's not well optimised nor structured.
+If anyone wants to use this please reach out to me so I know that I should start updating it again.
+
 # Smogon  file decoder
 Oh do I damn hope I named it correctly, as it's not exactly 'encoded' of any kind just formatted annoyingly.\
 Takes apart files findable in https://www.smogon.com/stats/yyyy-mm/ into usable dictionaries in your projects.
